@@ -88,8 +88,7 @@ def update_status(applications):
     application=find_application(applications,search)
 
     if application is not None:
-        new_status=input("Enter new status:")
-
+        new_status=get_valid_input("Status")
         application["Status"]=new_status.title()
 
         print("Status updated!\n")
@@ -154,12 +153,28 @@ def display_application(application):
 #DAY 6:Input validation
 
 def get_valid_input(field):
-    value=input("Enter the " + field +":").strip()
-    while value=="":
-        print(field +" cannot be empty.")
-        value=input("Enter the "+ field +":").strip()
+    value=input("Enter the " + field +":").strip().title()
+
+    while value == "":
+        print(field + " cannot be empty.")
+        value = input("Enter the " + field + ":").strip().title()
+
+    while field=="Status":
+        allowed_statuses = ["Applied", "Interview", "Rejected"]
+
+        while value == "":
+            print(field + " cannot be empty.")
+            value = input("Enter the " + field + ":").strip().title()
+
+        if value not in allowed_statuses:
+            print("Invalid status. Please enter Applied, Interview, or Rejected.")
+            value = input("Enter the " + field + ":").strip().title()
+        else:
+            return value
+
 
     return value
+
 
 def display_menu():
     print(""" 
