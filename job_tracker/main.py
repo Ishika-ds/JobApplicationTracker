@@ -1,4 +1,5 @@
-#DAY 1: Basic Job Application Tracker
+#Job Application Tracker
+import json
 
 application1={
     "Company":"TCS",
@@ -14,7 +15,6 @@ application2={
     "Location":"Bengaluru",
      "Status":"Interview",
     "Skills":"Python,SQL"
-
 }
 
 application3 ={
@@ -23,7 +23,6 @@ application3 ={
     "Location":"Mumbai",
      "Status":"Rejected",
     "Skills":"Python,Excel"
-
 }
 
 application4 ={
@@ -32,7 +31,6 @@ application4 ={
     "Location":"Pune",
      "Status":"Applied",
     "Skills":"Python,ML"
-
 }
 
 application5={
@@ -43,9 +41,27 @@ application5={
     "Skills":"Python,SQL,Git"
 }
 
-applications=[application1,application2,application3,application4,application5]
+def load_applications():
+    try:
+        with open("applications.json", "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        applications= [application1,application2,application3,application4,application5]
+        save_applications(applications)
+        return applications
 
-def display_applications(applications):
+    except json.JSONDecodeError:
+        print("Error: applications.json contains invalid JSON.")
+        print("Please restore a valid backup before continuing.")
+        raise SystemError
+
+def save_applications(applications):
+    with open("applications.json", "w") as file:
+        json.dump(applications,file,indent=4)
+
+applications=load_applications()
+
+def display_all_applications(applications):
     for application in applications:
         print(application["Company"],"|",application["Role"],"|",application["Location"],"|",application["Status"],"|",application["Skills"])
 
@@ -61,8 +77,7 @@ def add_application(applications,company,role,location,status,skills):
 
     applications.append(application)
 
-#DAY 2:Search and Update Status
-def find_application(applications,search):
+def find_application_by_company(applications,search):
     for application in applications:
         if search.lower()==application["Company"].lower():
             return application
@@ -70,14 +85,14 @@ def find_application(applications,search):
     return None
 
 
-def search_application(applications):
+def search_and_display_application(applications):
     search = input("Enter the company to search:")
 
-    application=find_application(applications,search)
+    application=find_application_by_company(applications,search)
 
     if application is not None:
         print("Application found!\n")
-        display_application(application)
+        display_application_details(application)
     else:
         print("No application found for this company!")
 
@@ -85,18 +100,18 @@ def search_application(applications):
 def update_status(applications):
     search=input("Enter the company to update:")
 
-    application=find_application(applications,search)
+    application=find_application_by_company(applications,search)
 
     if application is not None:
         new_status=get_valid_input("Status")
         application["Status"]=new_status.title()
+        save_applications(applications)
 
         print("Status updated!\n")
-        display_application(application)
+        display_application_details(application)
     else:
         print("No application found for this company!")
 
-#DAY 3: Count Applications by Status
 def count_applications_by_status(applications):
     status_count={}
 
@@ -114,7 +129,6 @@ def count_applications_by_status(applications):
     for current_status,count in status_count.items():
         print(current_status,":",count)
 
-#DAY 4: Most Common Skill
 def common_skills(applications):
 
     skill_count={}
@@ -139,8 +153,7 @@ def common_skills(applications):
 
     print("Most common skill:",common_skill)
 
-#DAY 5:Readability
-def display_application(application):
+def display_application_details(application):
 
     print(
         "Company:", application["Company"], "\n",
@@ -150,7 +163,6 @@ def display_application(application):
         "Skills:", application["Skills"], "\n",
         sep="")
 
-#DAY 6:Input validation
 
 def get_valid_input(field):
     value=input("Enter the " + field +":").strip().title()
@@ -204,12 +216,13 @@ while True:
                 skills = get_valid_input("Skills")
 
                 add_application(applications, company, role, location, status, skills)
+                save_applications(applications)
 
             elif choice==2:
-                display_applications(applications)
+                display_all_applications(applications)
 
             elif choice==3:
-                search_application(applications)
+                search_and_display_application(applications)
 
             elif choice==4:
                 update_status(applications)
